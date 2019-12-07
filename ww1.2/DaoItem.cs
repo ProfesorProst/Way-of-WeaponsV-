@@ -6,7 +6,7 @@ namespace revcom_bot
 {
     class DaoItem : IDao<Item>
     {
-        DBConnect dBConnect = new DBConnect();
+        DBConnect dBConnect = new DBConnect(); 
 
         // select * item where (person, item) 
         public Item GetPersonItem(long fkitem, long fkperson)
