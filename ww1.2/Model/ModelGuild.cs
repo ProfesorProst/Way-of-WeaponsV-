@@ -1,45 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using wayofweapon.CRUD;
+using wayofweapon.Entities;
 
-namespace revcom_bot
+namespace wayofweapon.Model
 {
     class ModelGuild
     {
-        readonly DaoGuild daoGuild;
-        Person person;
-        Guild guild;
-        private readonly ModelPerson _modelPerson;
+        CRUDGuild crudguild;
+        ModelPerson modelPerson;
 
         public ModelGuild()
         {
-            daoGuild = new DaoGuild();
-            _modelPerson = new ModelPerson();
+            crudguild = new CRUDGuild();
+            modelPerson = new ModelPerson();
         }
 
         public bool TryIfGuildMaster(long userId)
         {
             Guild g = GuildGet(userId);
-            person = _modelPerson.GetMe(userId);
+            Person person = modelPerson.GetPerson(userId);
             if (g == null) return false;
             if (g.master == person.personNick) return true;
             return false;
         }
 
-        public Guild GuildGet(long id)
+        public Guild GuildGet(long personId)
         {
-            person = _modelPerson.GetMe(id);
-            if (person == null) return null;
-            guild = daoGuild.GetObject(person.guild.GetValueOrDefault());
+            Person person = modelPerson.GetPerson(personId);
+            if (person.guild == null) return null;
+            Guild guild = crudguild.Read(person.guild.id);
             if (guild.master == null) return null;
-            guild.count = _modelPerson.GetPersonsGuildCount(guild.id);
+            guild.count = modelPerson.GetPersonsGuildCount(guild.id);
             return guild;
         }
 
         //Create a guild if person have 1000 gold && lvl >= 15.
         public Guild GuildCreate(long idperson, string name, out bool lvlIsSmal, out bool notEnouthGold)
         {
-            person = _modelPerson.GetMe(idperson);
+            Person person = modelPerson.GetPerson(idperson);
             lvlIsSmal = (person.lvl < 15) ? true : false;
             notEnouthGold = (person.gold <= 1000) ? true : false;
             if (lvlIsSmal || notEnouthGold) return null;
@@ -47,39 +47,41 @@ namespace revcom_bot
             {
                 fraction = person.fraction.GetValueOrDefault()
             };
-            daoGuild.Add(guild);
-            guild = daoGuild.GetGuildByName(name);
+            crudguild.Create(guild);
+            guild = crudguild.GetObjects().Where(x => x.name == guild.name).FirstOrDefault();
             if (guild == null) return null;
             person.gold -= 1000;
-            person.guild = guild.id;
-            _modelPerson.UpdateGuild(person);
+            person.guild = guild;
+            person.guildId = guild.id;
+            modelPerson.Update(person);
             return guild;
         }
 
         public Guild GuildJoinOut(long idperson, long idguild)
         {
-            person = _modelPerson.GetMe(idperson);
+            Person person = modelPerson.GetPerson(idperson);
             if (person.lvl < 10) return null;
-            person.guild = idguild;
-            Guild guild = daoGuild.GetObject(idguild);
+            Guild guild = crudguild.Read(idguild);
+            person.guild = guild;
             if (person.fraction != guild.fraction) return null;
-            _modelPerson.UpdateGuild(person);
+            modelPerson.Update(person);
+            guild = GuildGet(idperson);
             return guild;
         }
 
         public bool GuildLeave(long id)
         {
-            person = _modelPerson.GetMe(id);
+            Person person = modelPerson.GetPerson(id);
             if (person.guild == null) return false;
             person.guild = null;
-            _modelPerson.UpdateGuild(person);
+            modelPerson.Update(person);
             return true;
         }
 
         public List<Guild> GetOpenGuild(long id)
         {
-            person = new ModelPerson().GetMe(id);
-            List<Guild> guilds = daoGuild.GetOpenGuild();
+            Person person = new ModelPerson().GetPerson(id);
+            List<Guild> guilds = crudguild.GetObjects().Where(x=> x.hire = true).ToList();
             if (guilds == null) return null;
             List<Guild> guildsFraction = new List<Guild>();
             foreach (Guild guild in guilds)
@@ -90,9 +92,9 @@ namespace revcom_bot
 
         public void ChangeHire(long userId)
         {
-            guild = GuildGet(userId);
+            Guild guild = GuildGet(userId);
             guild.hire = !guild.hire;
-            daoGuild.Update(guild);
+            crudguild.Update(guild);
         }
 
         public string GetChatLink(long userId)
@@ -102,19 +104,19 @@ namespace revcom_bot
 
         public bool SetChatLink(long userId, string chatUrl)
         {
-            guild = GuildGet(userId);
+            Guild guild = GuildGet(userId);
             String s = guild.chatUrl + "";
             guild.chatUrl = chatUrl;
-            daoGuild.Update(guild);
-            Guild guild1 = daoGuild.GetObject(guild.id);
+            crudguild.Update(guild);
+            Guild guild1 = crudguild.Read(guild.id);
             if (guild1.chatUrl != "" && guild1.chatUrl != s) return true;
             return false;
         }
 
         public Person InvitePerson(long userId, string personNick, out Guild guild)
         {
-            person = _modelPerson.GetObjectByPersonNick(personNick);
-            guild = daoGuild.GetObject(_modelPerson.GetMe(userId).guild.GetValueOrDefault());
+            Person person = modelPerson.GetObjectByPersonNick(personNick);
+            guild = crudguild.Read(modelPerson.GetPerson(userId).guild.id);
             if (person != null || person.fraction == guild.fraction) return person;
             return null;
         }
@@ -122,35 +124,36 @@ namespace revcom_bot
         public Person ExcludePerson(long userId, string personNick, out bool gildMaster)
         {
             gildMaster = false;
-            Person personToExlude = _modelPerson.GetObjectByPersonNick(personNick);
-            Person personMaster = _modelPerson.GetMe(userId);
-            if (personToExlude.personNick == personMaster.personNick || personToExlude.guild != personMaster.guild){ gildMaster = true; return null;}
+            Person personToExlude = modelPerson.GetObjectByPersonNick(personNick);
+            Person personMaster = modelPerson.GetPerson(userId);
+            if (personToExlude.personNick == personMaster.personNick || personToExlude.guildId != personMaster.guild.id) { gildMaster = true; return null;}
             personToExlude.guild = null;
-            _modelPerson.Update(person);
-            personToExlude = _modelPerson.GetMe(personToExlude.id);
+            personToExlude.guildId = null;
+            modelPerson.Update(personToExlude);
+            personToExlude = modelPerson.GetPerson(personToExlude.id);
             return personToExlude.guild == null ? personToExlude : null;
         }
 
         public List<Person> GetMembers(long userId)
         {
-            person = new ModelPerson().GetMe(userId);
-            return _modelPerson.GetPersonsGuild(person.guild.GetValueOrDefault());
+            Person person = new ModelPerson().GetPerson(userId);
+            return modelPerson.GetPersonsGuild(person.guild.id);
         }
 
         public Person Work(long id, int energyused, out int goldOld, out int expOld, out bool lvlUp)
         {
-            person = _modelPerson.GetMe(id);
-            Guild guild = daoGuild.GetObject(person.guild.GetValueOrDefault());
-            person = _modelPerson.Work(id, out goldOld, out expOld, out lvlUp, energyused, guild);
+            Person person = modelPerson.GetPerson(id);
+            Guild guild = crudguild.Read(person.guild.id);
+            person = modelPerson.Work(id, out goldOld, out expOld, out lvlUp, energyused, guild);
             return person;
         }
 
         public bool WarIsStarting(long userId, bool attackOrDef)
         {
             if (!StateIfReadyToWar()) return false;
-            person = _modelPerson.GetMe(userId);
-            person.attackOrDef = attackOrDef;
-            _modelPerson.Update(person);
+            Person person = modelPerson.GetPerson(userId);
+            //person.attackOrDef = attackOrDef;
+            modelPerson.Update(person);
             return true;
         }
 
@@ -164,12 +167,12 @@ namespace revcom_bot
 
         public List<Guild> GetObjects()
         {
-            return daoGuild.GetObjects();
+            return crudguild.GetObjects();
         }
 
-        public void UpdateGold(Guild guild1)
+        internal void Update(Guild guild)
         {
-            daoGuild.UpdateGold(guild);
+            crudguild.Update(guild);
         }
     }
 }

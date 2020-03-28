@@ -5,22 +5,25 @@ using Microsoft.Owin.Hosting;
 using Owin;
 using Telegram.Bot.Types;
 using Telegram.Bot;
+using wayofweapon.Controler;
 
-namespace revcom_bot
+namespace wayofweapon
 {
-    //class Program
-    //{
-    //    static void Main(string[] args)
-    //    {
-    //        Console.WriteLine("Lets start a new journey!");
-    //        ControlerReceiver controlerReceiver = new ControlerReceiver();
-    //        Console.ReadKey();
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Lets start a new journey!");
+            ControlerReceiver controlerReceiver = new ControlerReceiver();
+            Console.ReadKey();
 
-    //    }
-    //}
+        }
+    }
+}
 
     //https://api.telegram.org/bot650877497:AAE5famvf8Hdy6rv7t4v2wStj6Tnl7wLmLs/setWebhook?url=https://b84f412c.ngrok.io
 
+        /*
     public static class Bot
     {
         public static readonly TelegramBotClient Api = new TelegramBotClient("533785870:AAEjN0SJJs02eMIO3rgL6IiUWhzz7-NMkeg"); //533785870:AAEjN0SJJs02eMIO3rgL6IiUWhzz7-NMkeg
@@ -31,11 +34,12 @@ namespace revcom_bot
 
         public static void Main(string[] args)
         {
-            using (WebApp.Start<Startup>("http://*:8081/"))
+            using (WebApp.Start<Startup>("http://localhost:8081/"))
             {
 
                 Console.WriteLine("Port 8081. Write webhook URL = ");
                 String s = Console.ReadLine() + "/webhook/";
+                Console.WriteLine(s);
                 try
                 {
                     Bot.Api.SetWebhookAsync(s).Wait();
@@ -87,3 +91,5 @@ namespace revcom_bot
         }
     }
 }
+
+    */

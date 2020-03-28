@@ -1,4 +1,4 @@
-﻿namespace revcom_bot
+﻿namespace wayofweapon.Entities
 {
     class Elf : Person
     {
@@ -10,22 +10,13 @@
             this.atack = 4;
             this.race = "Elf";
         }
+        public Elf()
+        {
+                
+        }
 
         public Elf(Person person) : base(person)
         {
-            this.id = person.id;
-            this.hp = person.hp;
-            this.energy = person.energy;
-            this.energytime = person.energytime;
-            this.maxenergy = person.maxenergy;
-            this.lvl = person.lvl;
-            this.exp = person.exp;
-            this.gold = person.gold;
-            this.def = person.def;
-            this.atack = person.atack;
-            this.personNick = person.personNick;
-            this.guild = person.guild;
-            this.fraction = person.fraction;
             this.race = "Elf";
         }
 
@@ -43,8 +34,8 @@
         {
             int startCountOfParams = 6;// start parametr atak + def = 6 - 1lvl = 5;
             int each7Lvl = 7; // on each 7lvl + 1 point; -1 point to use it
-            int countOfAttDef = startCountOfParams + (lvl - 1); // we start from 1 and dont add any 
-            int countOfAttDefANDspechialparams = startCountOfParams + (this.lvl - 1) + (lvl / each7Lvl);
+            int countOfAttDef = startCountOfParams + (lvl); // we start from 1 and dont add any 
+            int countOfAttDefANDspechialparams = startCountOfParams + (this.lvl) + (lvl / each7Lvl) - 1;
 
             if (state != -1 && (atack + def) < countOfAttDef)  // start parametr atak + def = 6 - 1lvl = 5; + on each 7lvl + 1 point
             {
@@ -53,7 +44,7 @@
                 changes = true;
             }
 
-            if (lvl % each7Lvl == 0 && (atack + def) < countOfAttDefANDspechialparams)
+            if (lvl % each7Lvl == 0 && (atack + def) == countOfAttDefANDspechialparams)
             {
                 atack += 1;
                 changes = true;

@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using wayofweapon.CRUD;
+using wayofweapon.Entities;
+using wayofweapon.Model;
+using wayofweapon.View;
 
-namespace revcom_bot
+namespace wayofweapon.Controler
 {
     class ControlerSender
     {
-        ModelPerson _modelPerson;
+        ModelPerson modelPerson;
         ModelGuild modelGuild;
         ModelTavern modelTavern;
-        View view;
+        AView view;
         ViewTown viewTown;
         ViewGuild viewGuild;
         public Telegram.Bot.TelegramBotClient bot;
 
         public ControlerSender(Telegram.Bot.TelegramBotClient bot)
         {
-            _modelPerson = new ModelPerson();
+            modelPerson = new ModelPerson();
             modelGuild = new ModelGuild();
             modelTavern = new ModelTavern();
-            view = new View();
+            view = new AView();
             viewTown = new ViewTown();
             viewGuild = new ViewGuild();  
             this.bot = bot;
@@ -30,7 +34,7 @@ namespace revcom_bot
             if (message.Text == "/start")
                 SendOneInlineMessage(userId, view.createNewUser, view.keyboardStart);
             else
-            if (_modelPerson.TryIfExist(userId))
+            if (modelPerson.TryIfExist(userId))
             {
                 switch (message.Text)
                 {
@@ -38,8 +42,8 @@ namespace revcom_bot
                     case "\U0001F482 Hero":
                     case "Back":
                         {
-                            Person person = _modelPerson.GetMe(userId);
-                            String s1 = view.States(person);
+                            Person person = modelPerson.GetPerson(userId);
+                            String s1 = view.States(person,modelPerson.atackAdditional(person.id),modelPerson.defAdditional(person.id));
                             SendOneMessage(userId, s1, view.keyboardHome);
                             if (person.lvl >= 5 && person.fraction == null)
                                 SendOneInlineMessage(userId, view.chooseFraction, view.keyboardChouseFraction);
@@ -48,7 +52,7 @@ namespace revcom_bot
                     case "/work":
                     case "\U0001F528 Work \U0001F33E":
                         {
-                            Person person = _modelPerson.Work(userId, out int goldOld, out int expOld, out bool lvlUp);
+                            Person person = modelPerson.Work(userId, out int goldOld, out int expOld, out bool lvlUp);
                             String[] work = view.Work(person, goldOld, expOld, lvlUp);
                             SendOneMessage(userId, work[0], view.keyboardHome);
                             if (work[1] != null)
@@ -74,7 +78,7 @@ namespace revcom_bot
                         Shop(message.Text, userId);
                         break;
                     case "\U0001F4E6 Inventory":
-                        string z = viewTown.GetInventory(_modelPerson.GetInventory(userId));
+                        string z = viewTown.GetInventory(modelPerson.GetInventory(userId));
                         SendOneMessage(userId, z, viewTown.keyboardTowne);
                         break;
 
@@ -96,7 +100,7 @@ namespace revcom_bot
         public void CallbackQuery(long userId, string data, Telegram.Bot.Types.Message message)
         {
             String s1;
-            if (_modelPerson.TryIfExist(userId))
+            if (modelPerson.TryIfExist(userId))
             {
                 if (data == "Elf" || data == "Orc" || data == "Person" || data == "Gnome")
                 {
@@ -108,26 +112,28 @@ namespace revcom_bot
                 {
                     int attackOrDef = 0;
                     if (data == "def") attackOrDef = 1;
-                    if (_modelPerson.LvlUp(userId, attackOrDef)) s1 = view.upStatesOK;
+                    if (modelPerson.LvlUp(userId, attackOrDef)) s1 = view.upStatesOK;
                     else s1 = view.upStatesFalse;
                     SendOneMessage(userId, s1, view.keyboardHome);
                 }
                 else
-                if ((data == "Alliance" || data == "Republic") && _modelPerson.GetMe(userId).fraction == null)
+                if ((data == "Alliance" || data == "Republic") && modelPerson.GetPerson(userId).fraction == null)
                 {
                     int allianceOrRepublic = 0;
                     if (data == "Republic") allianceOrRepublic = 1;
-                    if (_modelPerson.SetFraction(userId, allianceOrRepublic)) s1 = view.setFractionSuccses;
+                    if (modelPerson.SetFraction(userId, allianceOrRepublic)) s1 = view.setFractionSuccses;
                     else s1 = view.setFractionFail;
                     SendOneMessage(userId, s1, view.keyboardHome);
                 }
                 else
                 if (new Regex(@"^Accept ").IsMatch(data))
                 {
-                    Guild guild = modelGuild.GuildJoinOut(userId, Convert.ToInt64(message.Text.Split(' ')[1]));
+                    Guild guild = modelGuild.GuildJoinOut(userId, Convert.ToInt64(data.Split(' ')[1]));
                     if (guild != null)
                     {
                         SendOneMessage(userId, viewGuild.GetGuild(guild), viewGuild.keyboardGuild);
+                        Person person = modelPerson.GetObjectByPersonNick(guild.master);
+                        SendOneMessage(person.id, viewGuild.inviteAccepted, viewGuild.keyboardGuild);
                     }
                 }
             }
@@ -138,9 +144,9 @@ namespace revcom_bot
                 if (message.Chat.Username == "" || message.Chat.Username == null) SendOneMessage(userId, view.createNewUserEmptyUsername, view.keyboardHome);
                 else
                 {
-                    Person person = _modelPerson.CreateNewUser(userId, message.Chat.Username, data);
+                    Person person = modelPerson.CreateNewUser(userId, message.Chat.Username, data);
                     s1 = "You hav choosen " + data;
-                    String s2 = view.States(person);
+                    String s2 = view.States(person,modelPerson.atackAdditional(person.id),modelPerson.defAdditional(person.id));
                     SendTwoMessages(userId, s1, s2, view.keyboardHome);
                 }
             }
@@ -189,17 +195,17 @@ namespace revcom_bot
                     SendOneMessage(userId, viewTown.weaponMace, viewTown.keyboardShopWeapon);
                     break;
                 case var text1 when new Regex(@"^/Sby_\d{1,2}$").IsMatch(text):
-                    if (_modelPerson.ByItem(userId, Convert.ToInt32(text.Split('_')[1])))
+                    if (modelPerson.ByItem(userId, Convert.ToInt32(text.Split('_')[1])))
                         SendOneMessage(userId, viewTown.byOk, viewTown.keyboardShop);
                     else SendOneMessage(userId, viewTown.byBad, viewTown.keyboardShop);
                     break;
                 case var text2 when new Regex(@"^/Ssell_\d{1,2}$").IsMatch(text):
-                    if (_modelPerson.SellItem(userId, Convert.ToInt32(text.Split('_')[1])))
+                    if (modelPerson.SellItem(userId, Convert.ToInt32(text.Split('_')[1])))
                         SendOneMessage(userId, viewTown.sellOk, viewTown.keyboardShop);
                     else SendOneMessage(userId, viewTown.sellBad, viewTown.keyboardTowne);
                     break;
                 case var text3 when new Regex(@"^/Sequip_\d{1,2}$").IsMatch(text):
-                    _modelPerson.EquipItem(userId, Convert.ToInt32(text.Split('_')[1]));
+                    modelPerson.EquipItem(userId, Convert.ToInt32(text.Split('_')[1]));
                     SendOneMessage(userId, viewTown.equipped, viewTown.keyboardTowne);
                     break;
             }
@@ -265,13 +271,23 @@ namespace revcom_bot
                             SendOneInlineMessage(userId, view.chooseStates, view.keyboardLvlUp);
                     }
                     break;
+                case var text1 when new Regex(@"^/Gjoin_\d{1,3}$").IsMatch(text):
+                    {
+                        int guildId = Convert.ToInt32(text.Split('_')[1]);
+                        Guild guild = modelGuild.GuildJoinOut(userId,guildId);                        
+                        if (guild != null) //if have lvl up
+                            SendOneMessage(userId, viewGuild.GetGuild(guild), viewGuild.GetGuldReplyKeyboard(false));
+                        else
+                            SendOneMessage(userId, viewGuild.doSomeThingWrong, viewTown.keyboardTowne);
+                    }
+                    break;
                 case var text1 when modelGuild.TryIfGuildMaster(userId):
                     GuildMaster(text, userId);
                     break;
                 case "Create G":
                     SendOneMessage(userId, viewGuild.createGuild, viewGuild.keyboardCreateChoose);
                     break;
-                case var text2 when new Regex(@"^/GCreate_[a-z]{1,10}$", RegexOptions.IgnoreCase).IsMatch(text):
+                case var text2 when new Regex(@"^/GCreate_", RegexOptions.IgnoreCase).IsMatch(text):
                     {
                         string nameGuild = text.Split('_')[1];
                         Guild guildNew = modelGuild.GuildCreate(userId, nameGuild, out bool lvlIsSmall, out bool notEnouthGold);
@@ -312,7 +328,7 @@ namespace revcom_bot
                     break;
                 case var textInvite when new Regex(@"^/GInvite_", RegexOptions.IgnoreCase).IsMatch(text):
                     {
-                        Guild guild = new revcom_bot.Guild();
+                        Guild guild = new Guild();
                         Person person = modelGuild.InvitePerson(userId, text.Substring(9), out guild);
                         String stringForView = "";
                         if (person == null)
@@ -325,7 +341,7 @@ namespace revcom_bot
                         else
                         {
                             stringForView = viewGuild.inviteSucces;
-                            SendOneInlineMessage(person.id, viewGuild.GetMessageForInvite(guild), viewGuild.keyboardInvite);
+                            SendOneInlineMessage(person.id, viewGuild.GetMessageForInvite(guild), viewGuild.InviteInlineKeyboard(guild));
                         }
                         SendOneMessage(userId, stringForView, viewGuild.GetGuldReplyKeyboard(true));
                     }
@@ -395,10 +411,17 @@ namespace revcom_bot
                     {
                         String s = viewTown.goToTavernPlayLose;
                         bool state = modelTavern.FlipCoin(userId, out bool ifHaveEnoufMoney);
-                        if (!ifHaveEnoufMoney) s = viewTown.goToTavernDrinkFail;
+                        if (!ifHaveEnoufMoney)
+                        {
+                            s = viewTown.goToTavernDrinkFail;
+                            SendOneMessage(userId, s, viewTown.keyboardTavern);
+                        }
                         else
-                        if (state) s = viewTown.goToTavernPlayWin;
-                        SendTwoMessages(userId, viewTown.goToTavernPlay, s, viewTown.keyboardTavern);
+                        if (state)
+                        {
+                            s = viewTown.goToTavernPlayWin;
+                            SendTwoMessages(userId, viewTown.goToTavernPlay, s, viewTown.keyboardTavern);
+                        }
                     }
                     break;
             }
@@ -439,7 +462,7 @@ namespace revcom_bot
 
         private void SendMessagAll(String s)
         {
-            List<Person> people = new DaoPerson().GetObjects();
+            List<Person> people = new CRUDPerson().GetObjects();
             foreach (Person person in people)
                 SendOneMessage(person.id, s, view.keyboardHome);
         }

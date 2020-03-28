@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace revcom_bot
+namespace wayofweapon.Entities
 {
     class Guild
     {
+        [Key]
         public long id { get; set; }
+        [MaxLength(128), Index(IsUnique = true)]
         public string name { get; set; }
+        [MaxLength(128), Index(IsUnique = true)]
         public string master{ get; set; }
         public int gold { get; set; }
         public int maxplayers { get; set; }
@@ -25,6 +25,7 @@ namespace revcom_bot
             this.id = id;
             this.name = name;
             this.master = master;
+            this.maxplayers = 10;
             this.gold = gold;
         }
 
@@ -32,6 +33,7 @@ namespace revcom_bot
         {
             this.name = name;
             this.master = master;
+            this.maxplayers = 10;
         }
     }
 }

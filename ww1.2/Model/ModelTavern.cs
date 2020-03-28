@@ -1,6 +1,7 @@
 ﻿using System;
+using wayofweapon.Entities;
 
-namespace revcom_bot
+namespace wayofweapon.Model
 {
     class ModelTavern
     {
@@ -20,7 +21,7 @@ namespace revcom_bot
         public bool FlipCoin(long userId, out bool ifHaveEnoufMoney)
         {
             Random random = new Random();
-            person = _modelPerson.GetMe(userId);
+            person = _modelPerson.GetPerson(userId);
             ifHaveEnoufMoney = true;
             if (person.gold < flipCoinCost)
             {
@@ -44,12 +45,13 @@ namespace revcom_bot
 
         public bool Drink(long userId, out bool haveWinInFight)
         {
-            haveWinInFight = (new Random().Next(0, 100) < chanseToWinFightWhenDrinkPersents) ? true : false;
-            Person person = _modelPerson.GetMe(userId);
+            haveWinInFight = false;
+            Person person = _modelPerson.GetPerson(userId);
             if (person.gold >= costOfDrink)
             {
                 person.gold -= costOfDrink;
                 _modelPerson.Update(person);
+                haveWinInFight = (new Random().Next(0, 100) < chanseToWinFightWhenDrinkPersents) ? true : false;
             }
             else
                 return false;

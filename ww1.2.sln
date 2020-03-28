@@ -1,17 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ww1.2", "ww1.2\ww1.2.csproj", "{A5A6AEF2-2C86-4365-962E-84775AB375F8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1B768D4F-E74F-457B-A562-25EA5FADB7F4}"
-	ProjectSection(SolutionItems) = preProject
-		ww1.2\DaoItem.cs = ww1.2\DaoItem.cs
-		ww1.2\DaoPerson.cs = ww1.2\DaoPerson.cs
-		ww1.2\DaoUser.cs = ww1.2\DaoUser.cs
-		Graph1.dgml = Graph1.dgml
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

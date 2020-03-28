@@ -1,4 +1,4 @@
-﻿namespace revcom_bot
+﻿namespace wayofweapon.Entities
 {
     class People : Person
     {
@@ -8,25 +8,16 @@
             this.maxenergy = 5;
             this.def = 3;
             this.atack = 3;
-            this.race = "Peopl";
+            this.race = "Person";
+        }
+        public People()
+        {
+
         }
 
         public People(Person person) : base(person)
         {
-            this.id = person.id;
-            this.hp = person.hp;
-            this.energy = person.energy;
-            this.energytime = person.energytime;
-            this.maxenergy = person.maxenergy;
-            this.lvl = person.lvl;
-            this.exp = person.exp;
-            this.gold = person.gold;
-            this.def = person.def;
-            this.atack = person.atack;
-            this.personNick = person.personNick;
-            this.guild = person.guild;
-            this.fraction = person.fraction;
-            this.race = "Peopl";
+            this.race = "Person";
         }
 
         public override double GetMultiplierExp()
@@ -43,7 +34,7 @@
         {
             int startCountOfParams = 6;// start parametr atak + def = 6 - 1lvl = 5;
             int each7Lvl = 7; // on each 7lvl + 1 point; -1 point to use it
-            int countOfAttDef = startCountOfParams + (lvl - 1); // we start from 1 and dont add any 
+            int countOfAttDef = startCountOfParams + (lvl); // we start from 1 and dont add any 
             int countOfAttDefANDspechialparams = startCountOfParams + (lvl - 1) + (lvl / each7Lvl);
 
             if (state != -1 && (atack + def) < countOfAttDef)  // start parametr atak + def = 6 - 1lvl = 5; + on each 7lvl + 1 point

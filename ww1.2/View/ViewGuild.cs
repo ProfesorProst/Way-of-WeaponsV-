@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using wayofweapon.Entities;
 
-namespace revcom_bot
+namespace wayofweapon.View
 {
     class ViewGuild
     {
@@ -30,6 +31,7 @@ namespace revcom_bot
         public string inviteFaileByName;
         public string inviteFaileByGuild;
         public string inviteSucces;
+        public string inviteAccepted;
         public string leaveGuildSucces;
 
         public string readyToWar;
@@ -159,7 +161,7 @@ namespace revcom_bot
             settingGuildMaster = "What do you want to change guild master?";
             changeHire = "You change hire statys";
 
-            chatUrl = "Plese write comand /GSetChatUrl_ and  your invite link (without https://t.me/joinchat/)";
+            chatUrl = "Plese write comand /GSetChatUrl_ and  your invite link (without https://t.me/)";
             chatUrlSucces = "All right. You changed succesfuly";
             chatUrlFail = "Some thing gone wrong";
 
@@ -170,6 +172,7 @@ namespace revcom_bot
             inviteFaileByName = "We dont have such player!";
             inviteFaileByGuild = "This player is already a member of the guild!";
             inviteSucces = "We send invite message";
+            inviteAccepted = "Player accept you invite!";
 
             leaveGuildSucces = "You leave this guild. So now try to find better";
 
@@ -304,7 +307,7 @@ namespace revcom_bot
                 {
                     InlineKeyboard = new[]
                     {
-                        new[] {new InlineKeyboardButton {Text = "Chat", Url = "https://t.me/joinchat/" + chatUrl } }
+                        new[] {new InlineKeyboardButton {Text = "Chat", Url = "https://t.me/" + chatUrl } }
                     }
                 };
         }
@@ -323,7 +326,7 @@ namespace revcom_bot
 
         public String[] Work(Person person, int oldGold, int oldExp, bool lvlUp)
         {
-            return new View().Work(person, oldGold, oldExp, lvlUp);
+            return new AView().Work(person, oldGold, oldExp, lvlUp);
         }
 
         public string GetMessageForInvite(Guild guild)

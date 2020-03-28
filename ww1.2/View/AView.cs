@@ -1,8 +1,9 @@
 ﻿using System;
+using wayofweapon.Entities;
 
-namespace revcom_bot
+namespace wayofweapon.View
 {
-    class View
+    class AView
     {
         public String createNewUser { get; }// text for new user
         public String createNewUserEmptyUsername { get; }
@@ -21,7 +22,7 @@ namespace revcom_bot
         public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup keyboardHome { get; }
         
 
-        public View()
+        public AView()
         {
             bot = new Telegram.Bot.TelegramBotClient("533785870:AAEjN0SJJs02eMIO3rgL6IiUWhzz7-NMkeg");
             keyboardHome = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
@@ -94,10 +95,11 @@ namespace revcom_bot
         }
 
         // All states of person
-        public string States(Person person)
+        public string States(Person person, int atackAdditional, int defAdditional)
         {
             DateTime date = DateTime.Now;
             TimeSpan timeSpan = person.energytime - date;
+           
             string s = "<pre>\U0001F464 " + person.race + ":  " + person.personNick + "\n";
             if (person.fraction != null)
                 s += (person.fraction == 1) ? "Citizen of the \U000026CE Republic" : "Citizen of the \U00003299 Alliance" + "\n";
@@ -108,8 +110,8 @@ namespace revcom_bot
             s += "\n" + "\U0001F4EF Lvl:          " + person.lvl + "\n"
                       + "\U0001F4A1 Experience:   " + person.exp + "/" + person.GetExpToNextLVL() + "\n"
                       + "\U0001F4B0 Gold:         " + person.gold + "\n" + "\n"
-                      + "\U0001F6E1 Defence:      " + person.def + " + ( " + person.defAdditional + " )\n"
-                      + "\U00002694 Attack:       " + person.atack + " + ( " + person.atackAdditional + " )</pre>";
+                      + "\U0001F6E1 Defence:      " + person.def + " + ( " + defAdditional + " )\n"
+                      + "\U00002694 Attack:       " + person.atack + " + ( " + atackAdditional + " )</pre>";
             return s;
         }
 
@@ -125,7 +127,7 @@ namespace revcom_bot
         public String[] Work(Person person, int oldGold, int oldExp, bool lvlUp)
         {
             String[] s = new String[3];
-            if (person == null) s[0] = "You lose this mision!";
+            if (person == null) { s[0] = "You lose this mision!"; return s; }
             string[] variants = { "You went to the mine and got some stones", "You went to the field and caught a big mouse",
                 "You did not catch any fish, but on the way back found a wallet" };
             s[0] = variants[new Random().Next(0, variants.Length)] + "\n\n";

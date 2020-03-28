@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using wayofweapon.Entities;
 
-namespace revcom_bot
+namespace wayofweapon.View
 {
     class ViewTown
     {
@@ -138,7 +139,7 @@ namespace revcom_bot
             goToShop = "You see two benches";
             goToTavern = "This is Tavern...";
             goToTavernDrinkOk = "Wow this honey fry is good!";
-            goToTavernDrinkOkAndFight = "Oh my God! You made a fight! But even your penis appeared stronger and took away this loser wallet(+200 \U0001F4B0)";
+            goToTavernDrinkOkAndFight = "Oh my God! You fought! But you didn't have to do anything, your opponent sank and fell. You pick up his wallet (+200: bag :)";
             goToTavernDrinkFail = "You don't have enouf money. We dont want to see person like you!";
             goToTavernPlay = "Play a coin with the owner of the tavern";
             goToTavernPlayLose = "You lose";
@@ -238,15 +239,15 @@ namespace revcom_bot
             }
         }
 
-        public string GetInventory(List<Item> items)
+        public string GetInventory(List<Inventory> items)
         {
             if (items.Count() == 0) return "Inventory is empty...";
             string inventory = "You have:\n";
-            foreach(Item item in items)
+            foreach(Inventory item in items)
             {
-                inventory += item.name + " (\U0001F6E1 " + item.def + " | \U00002694 " + item.attack + ") - " + item.count;
+                inventory += item.item.name + " (\U0001F6E1 " + item.item.def + " | \U00002694 " + item.item.attack + ") - " + item.count;
                 if (item.eqiup) inventory += " Eqiuped";
-                inventory += "\n/Ssell_" + item.id + " | /Sequip_" + item.id + "\n";
+                inventory += "\n/Ssell_" + item.itemId + " | /Sequip_" + item.itemId + "\n";
             }
             inventory += "(if you want to sell it will cost twice as cheaply)";
             return inventory;

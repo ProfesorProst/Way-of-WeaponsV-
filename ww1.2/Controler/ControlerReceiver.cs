@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using Telegram.Bot;
+using wayofweapon.Entities;
+using wayofweapon.Model;
 
-namespace revcom_bot
+namespace wayofweapon.Controler
 {
     public partial class ControlerReceiver
     {
@@ -62,8 +64,8 @@ namespace revcom_bot
         private void RunThreadToCheckWar()
         {
             DateTime localDate = DateTime.Now;
-            DateTime startReadyWar = new DateTime(2018, 9, 9, 19, 0, 0);
-            DateTime endReadyWar = new DateTime(2018, 9, 9, 19, 15, 0);
+            DateTime startReadyWar = new DateTime(2019, 9, 9, 19, 0, 0);
+            DateTime endReadyWar = new DateTime(2019, 9, 9, 19, 15, 0);
             if ((localDate.Hour == startReadyWar.Hour && localDate.Minute >= startReadyWar.Minute && localDate.Minute <= endReadyWar.Minute))
             lock (locker)
             {

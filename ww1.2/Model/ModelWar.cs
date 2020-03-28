@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using wayofweapon.Entities;
 
-namespace revcom_bot
+namespace wayofweapon.Model
 {
     class ModelWar
     {
         readonly ModelPerson _modelPerson;
         private ModelGuild modelGuild;
-        private ModelIteam _modelIteam;
+        private ModelInventory _modelIteam;
 
         public ModelWar()
         {
             _modelPerson = new ModelPerson();
             modelGuild = new ModelGuild(); 
-            _modelIteam = new ModelIteam();
+            _modelIteam = new ModelInventory();
         }
 
         public List<Person> WarStart(out List<Person> peopleOld)
@@ -38,8 +37,8 @@ namespace revcom_bot
             List<Person> winer2 = new List<Person>();
             List<Person> loser2 = new List<Person>();
 
-            Item[] items1 = null;
-            Item[] items2 = null;
+            Inventory[] items1 = null;
+            Inventory[] items2 = null;
 
             List<Guild> allGuilds = modelGuild.GetObjects();
             List<Guild> impGuilds = new List<Guild>();
@@ -54,19 +53,19 @@ namespace revcom_bot
             foreach (Person person in people)
             {
                 if (person.fraction == null || person.lvl < 10) continue;
-                Person personFull = _modelPerson.GetMe(person.id);
+                Person personFull = _modelPerson.GetPerson(person.id);
                 if (person.fraction == person.GetAlliance())
                 {
                     fractionImpire.Add(personFull);
-                    if (personFull.attackOrDef == true)
+                    if (personFull.stateOfWar == true)
                     {
-                        impAtt += personFull.atack + personFull.atackAdditional;
+                        impAtt += personFull.atack + _modelPerson.atackAdditional(personFull.id);
                         impLvlAtt += personFull.lvl;
                         fractionImpireAtt.Add(person);
                     }
-                    else if (personFull.attackOrDef == false)
+                    else if (personFull.stateOfWar == false)
                     {
-                        impDef += personFull.def + personFull.defAdditional;
+                        impDef += personFull.def + _modelPerson.defAdditional(personFull.id);
                         impLvlDef += personFull.lvl;
                         fractionImpireDef.Add(person);
                     }
@@ -74,15 +73,15 @@ namespace revcom_bot
                 else if (person.fraction == person.GetRepublic())
                 {
                     fractionRepublic.Add(personFull);
-                    if (personFull.attackOrDef == true)
+                    if (personFull.stateOfWar == true)
                     {
-                        repAtt += personFull.atack + personFull.atackAdditional;
+                        repAtt += personFull.atack + _modelPerson.atackAdditional(personFull.id);
                         repLvlAtt += personFull.lvl;
                         fractionRepublicAtt.Add(person);
                     }
-                    else if(personFull.attackOrDef == false)
+                    else if(personFull.stateOfWar == false)
                     {
-                        repDef += personFull.def + personFull.defAdditional;
+                        repDef += personFull.def + _modelPerson.defAdditional(personFull.id);
                         repLvlDef += personFull.lvl;
                         fractionRepublicDef.Add(person);
                     }
@@ -144,18 +143,18 @@ namespace revcom_bot
             return _modelPerson.GetObjects();
         }
 
-        private void SetGoldForWiner(double moneyForLvl, Item[] items, List<Person> winer, List<Guild> guilds)
+        private void SetGoldForWiner(double moneyForLvl, Inventory[] items, List<Person> winer, List<Guild> guilds)
         {
             foreach(Person person in winer)
             {
                 person.exp += _modelPerson.AddToPersonExp(person.lvl, person.GetMultiplierExp()) * 2;
                 person.gold += Convert.ToInt32(person.lvl * moneyForLvl - person.lvl * moneyForLvl * 0.1);
-                SetGuildGold(ref guilds, person.guild.GetValueOrDefault(), Convert.ToInt32(person.lvl * moneyForLvl * 0.1));
-                _modelPerson.UpdateWork(person);
+                SetGuildGold(ref guilds, person.guild.id, Convert.ToInt32(person.lvl * moneyForLvl * 0.1));
+                _modelPerson.Update(person);
             }
 
             if(items != null)
-                foreach(Item item in items)
+                foreach(Inventory item in items)
                 {
                     Random random = new Random();
                     int number = random.Next(0,winer.Count());
@@ -185,7 +184,7 @@ namespace revcom_bot
             {
                 guild.gold -= Convert.ToInt32(guild.gold * 0.6);
                 cash += Convert.ToInt32(guild.gold * 0.6);
-                modelGuild.UpdateGold(guild);
+                modelGuild.Update(guild);
             }
             return cash;
         }
@@ -198,29 +197,31 @@ namespace revcom_bot
             {
                 person.gold -= Convert.ToInt32(person.gold * 0.5);
                 cash += Convert.ToInt32(person.gold * 0.5);
-                _modelPerson.UpdateWork(person);
+                _modelPerson.Update(person);
             }
             return cash;
         }
 
-        private Item[] GetIteams(ref List<Person> people)
+        private Inventory[] GetIteams(ref List<Person> people)
         {
-            Item[] items = new Item[0];
+            ModelInventory modelInventory = new ModelInventory();
+            Inventory[] items = new Inventory[0];
             if (!people.Any()) return null;
             foreach (Person person in people)
             {
-                if(person.items != null)
+                List<Inventory> inventory = modelInventory.GetPersonInventory(person.id);
+                if(inventory != null)
                 {
                     var rnd = new Random();
                     int randind = rnd.Next(0, 100);
                     if(randind <= 10)
                     {
                         var rand = new Random();
-                        int randIteam = rand.Next(0, person.items.Count());
-                        Item item = person.items[randIteam];
+                        int randIteam = rand.Next(0, inventory.Count());
+                        Inventory item = inventory[randIteam];
                         item.count -= 1;
                         if (item.count == 0) _modelIteam.DeleteIteamFromInventory(person.id, item.id);
-                        else _modelIteam.UpdatePersonInventory(person.id, item);
+                        else _modelIteam.UpdatePersonInventory(item);
                         Array.Resize(ref items, items.Length + 1);
                         items[items.Length - 1] = item;
                     }
@@ -229,10 +230,11 @@ namespace revcom_bot
             return items;
         }
 
+        //no
         private void CleanWarStatus(List<Person> people)
         {
             foreach(Person person in people)
-                _modelPerson.UpdateStateOfWarNull(person.id);
+                _modelPerson.Update(person);
         }
     }
 }
