@@ -15,8 +15,8 @@ namespace wayofweapon.View
         public string goToTavernPlay;
         public string goToTavernPlayWin;
         public string goToTavernPlayLose;
-        public string equipped;
 
+        public string equipped;
         public string sellOk;
         public string sellBad;
         public string byOk;
@@ -29,7 +29,7 @@ namespace wayofweapon.View
         public string weaponAxe;
         public string armorHead;
         public string armorBody;
-        public string armorHands; 
+        public string armorHands;
         public string armorLegs;
 
         public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup keyboardTowne { get; }
@@ -243,7 +243,7 @@ namespace wayofweapon.View
         {
             if (items.Count() == 0) return "Inventory is empty...";
             string inventory = "You have:\n";
-            foreach(Inventory item in items)
+            foreach (Inventory item in items)
             {
                 inventory += item.item.name + " (\U0001F6E1 " + item.item.def + " | \U00002694 " + item.item.attack + ") - " + item.count;
                 if (item.eqiup) inventory += " Eqiuped";

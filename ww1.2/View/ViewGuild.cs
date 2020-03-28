@@ -10,7 +10,6 @@ namespace wayofweapon.View
     class ViewGuild
     {
         public string guildHello;
-        public string donthaveenough;
         public string createGuildOk;
         public string createGuildFalseName;
         public string createGuildFalseGold;
@@ -29,13 +28,12 @@ namespace wayofweapon.View
         public string excludeSucces;
         public string excludeSuccesMessageToPlayer;
         public string inviteFaileByName;
+        public string kikFailIMaster;
         public string inviteFaileByGuild;
         public string inviteSucces;
         public string inviteAccepted;
         public string leaveGuildSucces;
 
-        public string readyToWar;
-        public string readyToWarSuccess;
         public string doSomeThingWrong;
 
         public InlineKeyboardMarkup keyboardInvite { get; set; }
@@ -44,7 +42,6 @@ namespace wayofweapon.View
         public ReplyKeyboardMarkup keyboardWorkGuild { get; }
         public ReplyKeyboardMarkup keyboardGuildMaster { get; }
         public ReplyKeyboardMarkup keyboardGuildMasterSetting { get; }
-        public ReplyKeyboardMarkup keyboardWar { get; }
 
         public ViewGuild()
         {
@@ -103,23 +100,6 @@ namespace wayofweapon.View
                 ResizeKeyboard = true
             };
 
-            keyboardWar = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-            {
-                Keyboard = new[]
-                {
-                    new[]
-                    {
-                        new Telegram.Bot.Types.KeyboardButton(" Attack G"),
-                        new Telegram.Bot.Types.KeyboardButton(" Def G")
-                    },
-                    new[]
-                    {
-                        new Telegram.Bot.Types.KeyboardButton(" Guild G"),
-                        new Telegram.Bot.Types.KeyboardButton(" Back ")
-                    },
-                },
-                ResizeKeyboard = true
-            };
 
             keyboardWorkGuild = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
             {
@@ -150,7 +130,6 @@ namespace wayofweapon.View
             });
 
             guildHello = "You are enter a guild house";
-            donthaveenough = "It seems that you don't have enough money/lvl";
             workGuild = "You see on the notice board some jobs: ";
             createGuild = "Write a name of the guild after command /GCreate_. For example: /GCreate_GuildName. You need 1000 gold and 15 lvl";
             createGuildOk = "You just create a new guild. Guildmaster!";
@@ -169,6 +148,7 @@ namespace wayofweapon.View
             exclude = "Write a name of the person after command /GExlude_. For example: /GExlude_PersonTest";
             excludeSucces = "Exclude succes";
             excludeSuccesMessageToPlayer = "You was exclude from guild!";
+            kikFailIMaster = "You cant kik your self!";
             inviteFaileByName = "We dont have such player!";
             inviteFaileByGuild = "This player is already a member of the guild!";
             inviteSucces = "We send invite message";
@@ -176,8 +156,6 @@ namespace wayofweapon.View
 
             leaveGuildSucces = "You leave this guild. So now try to find better";
 
-            readyToWar = "Check the ammunition and choose which troops you want to join";
-            readyToWarSuccess = "You are ready to the War!";
             doSomeThingWrong = "I think you do some thing wrong!";
         }
 
@@ -190,12 +168,12 @@ namespace wayofweapon.View
             if (!(localDate.Hour >= startReadyWar.Hour && localDate.Hour < endReadyWar.Hour && localDate.Minute >= startReadyWar.Minute))
                 switch (masterOrPlayer)
                 {
-                case false:
-                {
-                    keyboardGuild = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-                    {
-                        Keyboard = new[]
+                    case false:
                         {
+                            keyboardGuild = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+                            {
+                                Keyboard = new[]
+                                {
                             new[]
                             {
                                 new Telegram.Bot.Types.KeyboardButton(" Chat G"),
@@ -207,16 +185,16 @@ namespace wayofweapon.View
                                 new Telegram.Bot.Types.KeyboardButton(" Back ")
                             },
                         },
-                    ResizeKeyboard = true
-                    };
-                return keyboardGuild;
-                }
-                case true:
-                {
-                    return new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-                    {
-                        Keyboard = new[]
+                                ResizeKeyboard = true
+                            };
+                            return keyboardGuild;
+                        }
+                    case true:
                         {
+                            return new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+                            {
+                                Keyboard = new[]
+                                {
                             new[]
                             {
                                 new Telegram.Bot.Types.KeyboardButton(" Setting G"),
@@ -229,56 +207,9 @@ namespace wayofweapon.View
                                 new Telegram.Bot.Types.KeyboardButton(" Back ")
                             },
                         },
-                        ResizeKeyboard = true
-                    };
-                }
-                }
-            else
-                switch (masterOrPlayer)
-                {
-                case false:
-                {
-                    return new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-                    {
-                        Keyboard = new[]
-                        {
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton(" War G"),
-                            new Telegram.Bot.Types.KeyboardButton(" Chat G"),
-                            new Telegram.Bot.Types.KeyboardButton(" Work G")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton(" Guild G "),
-                            new Telegram.Bot.Types.KeyboardButton(" Back ")
-                        },
-                    },
-                        ResizeKeyboard = true
-                    };
-                }
-                case true:
-                {
-                    return new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-                    {
-                        Keyboard = new[]
-                        {
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton(" Setting G"),
-                            new Telegram.Bot.Types.KeyboardButton(" Chat G"),
-                            new Telegram.Bot.Types.KeyboardButton(" Work G")
-                        },
-                        new[]
-                        {
-                            new Telegram.Bot.Types.KeyboardButton(" War G"),
-                            new Telegram.Bot.Types.KeyboardButton(" Guild G "),
-                            new Telegram.Bot.Types.KeyboardButton(" Back ")
-                        },
-                    },
-                        ResizeKeyboard = true
-                    };
-                }
+                                ResizeKeyboard = true
+                            };
+                        }
                 }
             return keyboardGuild;
         }
@@ -286,8 +217,8 @@ namespace wayofweapon.View
         public string GetChatUrl(string chatUrl)
         {
             if (chatUrl == "") return "Your guild master havant set your chat yet";
-            else 
-            return "Good luck";
+            else
+                return "Good luck";
         }
 
         public string GetMembersOfGuild(List<Person> people)
@@ -331,7 +262,7 @@ namespace wayofweapon.View
 
         public string GetMessageForInvite(Guild guild)
         {
-            return  "@" + guild.master + " want to hire you in guild " + guild.name + ". Please make you chouse)";
+            return "@" + guild.master + " want to hire you in guild " + guild.name + ". Please make you chouse)";
         }
 
         public InlineKeyboardMarkup InviteInlineKeyboard(Guild guild)
@@ -347,7 +278,7 @@ namespace wayofweapon.View
             return keyboardInvite;
         }
 
-        public string  GetOpenGuilds(List<Guild> guilds)
+        public string GetOpenGuilds(List<Guild> guilds)
         {
             string guldslist = "";
             Random rand = new Random((DateTime.Now.Millisecond + DateTime.Now.Minute));
@@ -360,7 +291,7 @@ namespace wayofweapon.View
                     guldslist += "Name: " + guild.name + ". " + guild.count + "/" + guild.maxplayers + "\n" +
                         "/Gjoin_" + guild.id;
                 }
-            else if ( z < 5 )
+            else if (z < 5)
                 for (int i = 0; i < z; i++)
                 {
                     Guild guild = guilds[i];

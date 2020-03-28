@@ -81,7 +81,7 @@ namespace wayofweapon.Model
         public List<Guild> GetOpenGuild(long id)
         {
             Person person = new ModelPerson().GetPerson(id);
-            List<Guild> guilds = crudguild.GetObjects().Where(x=> x.hire = true).ToList();
+            List<Guild> guilds = crudguild.GetObjects().Where(x => x.hire = true).ToList();
             if (guilds == null) return null;
             List<Guild> guildsFraction = new List<Guild>();
             foreach (Guild guild in guilds)
@@ -126,7 +126,7 @@ namespace wayofweapon.Model
             gildMaster = false;
             Person personToExlude = modelPerson.GetObjectByPersonNick(personNick);
             Person personMaster = modelPerson.GetPerson(userId);
-            if (personToExlude.personNick == personMaster.personNick || personToExlude.guildId != personMaster.guild.id) { gildMaster = true; return null;}
+            if (personToExlude.personNick == personMaster.personNick || personToExlude.guildId != personMaster.guild.id) { gildMaster = true; return null; }
             personToExlude.guild = null;
             personToExlude.guildId = null;
             modelPerson.Update(personToExlude);

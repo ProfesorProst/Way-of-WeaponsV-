@@ -48,7 +48,7 @@
                 maxenergy += 1;
                 changes = true;
             }
-            return changes;    
+            return changes;
         }
     }
 }

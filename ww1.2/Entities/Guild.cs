@@ -10,7 +10,7 @@ namespace wayofweapon.Entities
         [MaxLength(128), Index(IsUnique = true)]
         public string name { get; set; }
         [MaxLength(128), Index(IsUnique = true)]
-        public string master{ get; set; }
+        public string master { get; set; }
         public int gold { get; set; }
         public int maxplayers { get; set; }
         public bool hire { get; set; } // true  hire - open\

@@ -45,7 +45,7 @@ namespace wayofweapon.Model
                     return false;
             }
             catch (Exception) { return false; }
-             return true;
+            return true;
         }
 
         //+
@@ -139,14 +139,14 @@ namespace wayofweapon.Model
 
         public int AddToPersonExp(int lvl, double GetMultiplierExp, int useEnergy = 1)
         {
-            double myltE = (double)new Random().Next(lvl * 2 + 1, lvl * 2 + (lvl + 2)) * GetMultiplierExp;
-            myltE = (useEnergy == 1) ? myltE : myltE * (useEnergy * multiplierForOneWork);
-            return Convert.ToInt32(myltE);
+            double energyForOneWork = (double)new Random().Next(lvl * 2 + 1, lvl * 2 + (lvl + 2)) * GetMultiplierExp;
+            energyForOneWork = (useEnergy == 1) ? energyForOneWork : energyForOneWork * (useEnergy * multiplierForOneWork);
+            return Convert.ToInt32(energyForOneWork);
         }
 
         internal Person GetObjectByPersonNick(string personNick)
         {
-            return crudPerson.GetObjects().Where(x=> x.personNick == personNick).FirstOrDefault();
+            return crudPerson.GetObjects().Where(x => x.personNick == personNick).FirstOrDefault();
         }
 
         public int AddToPersonGold(int lvl, double GetMultiplierGold, int useEnergy = 1)
@@ -174,6 +174,7 @@ namespace wayofweapon.Model
 
                 if (useEnergy != 1 && new Random().Next(0, 100) <= (chanseToFailOneWork * useEnergy))
                 {
+                    crudPerson.Update(person);
                     return null;
                 }
 
@@ -232,7 +233,7 @@ namespace wayofweapon.Model
             }
             return false;
         }
-        
+
         public Person GetEntety(Person person)
         {
             switch (person.race)
@@ -269,16 +270,15 @@ namespace wayofweapon.Model
         {
             Person person = crudPerson.Read(id);
             Item item = modelItem.GetObject(idIteam);
-            modelInventory.AddToInventory(person,item);
+            modelInventory.AddToInventory(person, item);
             return true;
         }
 
         public bool SellItem(long idperson, long iditem)
         {
-            modelInventory.DeleteIteamFromInventory(idperson,iditem);
+            modelInventory.DeleteIteamFromInventory(idperson, iditem);
             return true;
         }
-
 
         public bool EquipItem(long idperson, long iditem)
         {
@@ -324,53 +324,6 @@ namespace wayofweapon.Model
 
             return true;
         }
-
-        /*
-        public bool EquipItem(long idperson, long iditem)
-        {
-            Item item = modelInventory.GetPersonItem(iditem, idperson);
-            if (item == null) return false;
-            Inventory itemEquipped = modelInventory.GetIfHadeSameTypeEquipped(idperson, item.type);
-            if (itemEquipped != null)
-                itemEquipped.eqiup = false;
-            itemEquipped.eqiup = true;
-            modelInventory.UpdatePersonInventory(itemEquipped);
-
-            return true;
-            /*
-            List<Inventory> inventories = modelInventory.GetPersonInventory(idperson);
-            var type = (item.type == "swords" || item.type == "bones" || item.type == "mace" || item.type == "axe")? true : false;
-            var wepon = false;
-            Inventory itemweapon = null;
-            foreach (var inven in inventories)
-            {
-                
-                if (type)
-                {
-                    // equip weapon
-                    if ((inven.item.type == "swords" || inven.item.type == "bones" || inven.item.type == "mace" ||
-                         inven.item.type == "axe") && inven.eqiup == true)
-                    {
-                        itemweapon = inven;
-                        itemweapon.eqiup = false;
-                        modelInventory.UpdatePersonInventory(idperson, itemweapon);
-                    }
-                }
-                else if (inven.id == iditem) // equip amo
-                {
-             
-                Inventory itemEquipped = modelInventory.GetIfHadeSameTypeEquipped(idperson, item.type);
-                if (itemEquipped != null)
-                {
-                    itemEquipped.eqiup = false;
-                    modelInventory.UpdatePersonInventory(itemEquipped);
-                }
-            }
-            }
-               
-
-        }
-    */
 
         public bool SetFraction(long idperson, int allianceOrRepublic)
         {

@@ -27,7 +27,7 @@
 
         public override double GetMultiplierGold()
         {
-            return 1 + (lvl / 7) * 0.05;
+            return 1.25 + (lvl / 7) * 0.05;
         }
 
         public override bool LvlUp(int state)

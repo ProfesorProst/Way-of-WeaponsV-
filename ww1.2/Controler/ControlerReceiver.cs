@@ -74,7 +74,7 @@ namespace wayofweapon.Controler
                         foreach(Person personNew in peopleNew)
                             if(personOld.id == personNew.id && personOld.exp != personNew.exp)
                             {
-                                controlerSender.WarSend(personOld, personNew);
+                                //controlerSender.WarSend(personOld, personNew);
                             }
             }
             Thread.Sleep(4500);

@@ -38,9 +38,9 @@ namespace wayofweapon.CRUD
             context.SaveChanges();
         }
 
-        public Inventory Read(long id)
+        public Inventory Read(long inventoryId)
         {
-            return context.inventories.Find(id);
+            return context.inventories.Find(inventoryId);
         }
 
         public Inventory Read(long personId, long itemId)
@@ -61,9 +61,9 @@ namespace wayofweapon.CRUD
             context.SaveChanges();
         }
 
-        public List<Inventory> GetInventories(long id)
+        public List<Inventory> GetInventories(long personId)
         {
-            return context.inventories.Where(x=> x.person.id == id).ToList();
+            return context.inventories.Where(x => x.person.id == personId).ToList();
         }
     }
 }

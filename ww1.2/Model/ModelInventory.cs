@@ -57,7 +57,7 @@ namespace wayofweapon.Model
 
         public void AddToInventory(Person person, Item item)
         {
-            Inventory inv = crudInventory.Read(person.id, item.id);            
+            Inventory inv = crudInventory.Read(person.id, item.id);
             if (inv != null)
             {
                 inv = GetObject(inv.id);
@@ -74,12 +74,12 @@ namespace wayofweapon.Model
         public Inventory GetPersonItem(long iditem, long idperson)
         {
             Inventory inv = crudInventory.Read(idperson, iditem);
-            return inv==null? null: GetObject(inv.id);
+            return inv == null ? null : GetObject(inv.id);
         }
 
         public Inventory GetIfHadeSameTypeEquipped(long idperson, string itemType)
         {
-            
+
             List<Inventory> invNew = GetPersonInventory(idperson);
             return invNew.Where(x => x.item.type == itemType && x.eqiup == true).FirstOrDefault();
         }

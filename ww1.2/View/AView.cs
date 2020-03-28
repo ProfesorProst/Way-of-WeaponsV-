@@ -15,16 +15,14 @@ namespace wayofweapon.View
         public String chooseFraction;
         public String errorMessage { get; }
 
-        Telegram.Bot.TelegramBotClient bot;
         public Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup keyboardStart { get; }
         public Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup keyboardLvlUp { get; }
         public Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup keyboardChouseFraction { get; }
         public Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup keyboardHome { get; }
-        
+
 
         public AView()
         {
-            bot = new Telegram.Bot.TelegramBotClient("533785870:AAEjN0SJJs02eMIO3rgL6IiUWhzz7-NMkeg");
             keyboardHome = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
             {
                 Keyboard = new[]
@@ -99,7 +97,7 @@ namespace wayofweapon.View
         {
             DateTime date = DateTime.Now;
             TimeSpan timeSpan = person.energytime - date;
-           
+
             string s = "<pre>\U0001F464 " + person.race + ":  " + person.personNick + "\n";
             if (person.fraction != null)
                 s += (person.fraction == 1) ? "Citizen of the \U000026CE Republic" : "Citizen of the \U00003299 Alliance" + "\n";
@@ -113,14 +111,6 @@ namespace wayofweapon.View
                       + "\U0001F6E1 Defence:      " + person.def + " + ( " + defAdditional + " )\n"
                       + "\U00002694 Attack:       " + person.atack + " + ( " + atackAdditional + " )</pre>";
             return s;
-        }
-
-
-        public string GetChangesAfterWar(Person person, Person personNew)
-        {
-            return "The gods are pleased with you.\n"
-                            + "Your exp: +" + (personNew.exp - person.exp)+ "\n"
-                            + "Your gold: +" + (personNew.gold - person.gold);
         }
 
         // When person go to "Work"

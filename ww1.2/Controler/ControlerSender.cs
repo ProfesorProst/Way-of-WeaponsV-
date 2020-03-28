@@ -25,7 +25,7 @@ namespace wayofweapon.Controler
             modelTavern = new ModelTavern();
             view = new AView();
             viewTown = new ViewTown();
-            viewGuild = new ViewGuild();  
+            viewGuild = new ViewGuild();
             this.bot = bot;
         }
 
@@ -43,7 +43,7 @@ namespace wayofweapon.Controler
                     case "Back":
                         {
                             Person person = modelPerson.GetPerson(userId);
-                            String s1 = view.States(person,modelPerson.atackAdditional(person.id),modelPerson.defAdditional(person.id));
+                            String s1 = view.States(person, modelPerson.atackAdditional(person.id), modelPerson.defAdditional(person.id));
                             SendOneMessage(userId, s1, view.keyboardHome);
                             if (person.lvl >= 5 && person.fraction == null)
                                 SendOneInlineMessage(userId, view.chooseFraction, view.keyboardChouseFraction);
@@ -146,15 +146,10 @@ namespace wayofweapon.Controler
                 {
                     Person person = modelPerson.CreateNewUser(userId, message.Chat.Username, data);
                     s1 = "You hav choosen " + data;
-                    String s2 = view.States(person,modelPerson.atackAdditional(person.id),modelPerson.defAdditional(person.id));
+                    String s2 = view.States(person, modelPerson.atackAdditional(person.id), modelPerson.defAdditional(person.id));
                     SendTwoMessages(userId, s1, s2, view.keyboardHome);
                 }
             }
-        }
-
-        public void WarSend(Person personOld, Person personNew)
-        {
-            SendOneMessage(personOld.id, view.GetChangesAfterWar(personOld, personNew), view.keyboardHome);
         }
 
         private void Shop(string text, long userId)
@@ -195,14 +190,17 @@ namespace wayofweapon.Controler
                     SendOneMessage(userId, viewTown.weaponMace, viewTown.keyboardShopWeapon);
                     break;
                 case var text1 when new Regex(@"^/Sby_\d{1,2}$").IsMatch(text):
+                    string byStatus = viewTown.byBad;
                     if (modelPerson.ByItem(userId, Convert.ToInt32(text.Split('_')[1])))
-                        SendOneMessage(userId, viewTown.byOk, viewTown.keyboardShop);
-                    else SendOneMessage(userId, viewTown.byBad, viewTown.keyboardShop);
+                        byStatus = viewTown.byOk;
+                    SendOneMessage(userId, byStatus, viewTown.keyboardShop);
                     break;
                 case var text2 when new Regex(@"^/Ssell_\d{1,2}$").IsMatch(text):
+                    string sellStatus = viewTown.sellBad;
                     if (modelPerson.SellItem(userId, Convert.ToInt32(text.Split('_')[1])))
-                        SendOneMessage(userId, viewTown.sellOk, viewTown.keyboardShop);
-                    else SendOneMessage(userId, viewTown.sellBad, viewTown.keyboardTowne);
+                        sellStatus = viewTown.sellOk;
+                    SendOneMessage(userId, sellStatus, viewTown.keyboardShop);
+
                     break;
                 case var text3 when new Regex(@"^/Sequip_\d{1,2}$").IsMatch(text):
                     modelPerson.EquipItem(userId, Convert.ToInt32(text.Split('_')[1]));
@@ -246,22 +244,6 @@ namespace wayofweapon.Controler
                         SendOneInlineMessage(userId, viewGuild.GetChatUrl(s), viewGuild.GetChatUrlKeyboard(s));
                     }
                     break;
-                case "War G":
-                    SendOneMessage(userId, viewGuild.readyToWar, viewGuild.keyboardWar);
-                    break;
-                case "Attack G":
-                case "Def G":
-                    {
-                        bool ifTimeIsRight;
-                        if (text == "Attack G")
-                            ifTimeIsRight = modelGuild.WarIsStarting(userId, true);
-                        else ifTimeIsRight = modelGuild.WarIsStarting(userId, false);
-                        if (ifTimeIsRight)
-                            SendOneMessage(userId, viewGuild.readyToWarSuccess, view.keyboardHome);
-                        else SendOneMessage(userId, viewGuild.doSomeThingWrong, view.keyboardHome);
-
-                    }
-                    break;
                 case var text1 when new Regex(@"⚡\) G$").IsMatch(text):
                     {
                         Person person = modelGuild.Work(userId, Convert.ToInt32(text.Substring(0, 1)) + 1, out int goldOld, out int expOld, out bool lvlUp); // number start from 1, by it use 2 energy
@@ -274,7 +256,7 @@ namespace wayofweapon.Controler
                 case var text1 when new Regex(@"^/Gjoin_\d{1,3}$").IsMatch(text):
                     {
                         int guildId = Convert.ToInt32(text.Split('_')[1]);
-                        Guild guild = modelGuild.GuildJoinOut(userId,guildId);                        
+                        Guild guild = modelGuild.GuildJoinOut(userId, guildId);
                         if (guild != null) //if have lvl up
                             SendOneMessage(userId, viewGuild.GetGuild(guild), viewGuild.GetGuldReplyKeyboard(false));
                         else
@@ -292,9 +274,9 @@ namespace wayofweapon.Controler
                         string nameGuild = text.Split('_')[1];
                         Guild guildNew = modelGuild.GuildCreate(userId, nameGuild, out bool lvlIsSmall, out bool notEnouthGold);
                         if (lvlIsSmall) nameGuild = viewGuild.createGuildFalseLvl;
-                        else if(notEnouthGold) nameGuild = viewGuild.createGuildFalseGold;
-                            else if (guildNew == null) nameGuild = viewGuild.createGuildFalseName;
-                                else nameGuild = viewGuild.createGuildOk;
+                        else if (notEnouthGold) nameGuild = viewGuild.createGuildFalseGold;
+                        else if (guildNew == null) nameGuild = viewGuild.createGuildFalseName;
+                        else nameGuild = viewGuild.createGuildOk;
                         SendOneMessage(userId, nameGuild, view.keyboardHome);
                         break;
                     }
@@ -312,7 +294,7 @@ namespace wayofweapon.Controler
         }
 
         private void GuildMaster(string text, long userId)
-        { 
+        {
             switch (text)
             {
                 case "/GInvite":
@@ -351,8 +333,8 @@ namespace wayofweapon.Controler
                         Person person = modelGuild.ExcludePerson(userId, text.Substring(9), out bool gildMaster);
                         String stringForView = "";
                         if (person == null)
-                            stringForView = (gildMaster)? "You cant kik your self!" : viewGuild.inviteFaileByName;
-                        else 
+                            stringForView = (gildMaster) ? viewGuild.kikFailIMaster : viewGuild.inviteFaileByName;
+                        else
                         {
                             stringForView = viewGuild.excludeSucces;
                             SendOneMessage(person.id, viewGuild.excludeSuccesMessageToPlayer, view.keyboardHome);
@@ -362,13 +344,9 @@ namespace wayofweapon.Controler
                     break;
                 case var textInvite when new Regex(@"^/GSetChatUrl_", RegexOptions.IgnoreCase).IsMatch(text):
                     {
-                        String s = "";
+                        String s = viewGuild.chatUrlFail;
                         if (modelGuild.SetChatLink(userId, text.Substring(13)))
-                        {
                             s = viewGuild.chatUrlSucces;
-                        }
-                        else
-                            s = viewGuild.chatUrlFail;
                         SendOneMessage(userId, s, viewGuild.GetGuldReplyKeyboard(true));
                     }
                     break;
@@ -384,7 +362,7 @@ namespace wayofweapon.Controler
                     break;
                 case "All members G":
                     {
-                        List<Person> people = modelGuild.GetMembers(userId); 
+                        List<Person> people = modelGuild.GetMembers(userId);
                         SendOneMessage(userId, viewGuild.GetMembersOfGuild(people), viewGuild.keyboardGuildMasterSetting);
                     }
                     break;
@@ -445,7 +423,7 @@ namespace wayofweapon.Controler
         {
             try
             {
-                bot.SendTextMessageAsync(id, s1, true, true, 0, keyboardMarkup,  Telegram.Bot.Types.Enums.ParseMode.Html);
+                bot.SendTextMessageAsync(id, s1, true, true, 0, keyboardMarkup, Telegram.Bot.Types.Enums.ParseMode.Html);
                 bot.SendTextMessageAsync(id, s2, true, true, 0, keyboardMarkup, Telegram.Bot.Types.Enums.ParseMode.Html);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException ex) { }
